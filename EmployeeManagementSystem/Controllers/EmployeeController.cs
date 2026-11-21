@@ -84,6 +84,21 @@ namespace EmployeeManagementSystem.Controllers
             }
         }
 
+        public int? GetIdByEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return null;
+
+            using (var conn = Database.GetConnection())
+            using (var cmd = new MySqlCommand(
+                "SELECT employee_id FROM employees WHERE email = @email LIMIT 1", conn))
+            {
+                conn.Open();
+                cmd.Parameters.AddWithValue("@email", email.Trim());
+                object result = cmd.ExecuteScalar();
+                return result == null || result == DBNull.Value ? (int?)null : Convert.ToInt32(result);
+            }
+        }
+
         public string Create(Employee emp)
         {
             if (string.IsNullOrWhiteSpace(emp.FirstName) || string.IsNullOrWhiteSpace(emp.LastName)

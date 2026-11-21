@@ -7,7 +7,7 @@ namespace EmployeeManagementSystem.View
     public partial class LeaveForm : Form
     {
         private readonly LeaveController _controller = new LeaveController();
-        private readonly int? _employeeId;
+        private int? _employeeId;
 
         public LeaveForm()
         {
@@ -15,6 +15,12 @@ namespace EmployeeManagementSystem.View
             dgvBalance.AutoGenerateColumns = false;
             dgvRequests.AutoGenerateColumns = false;
             _employeeId = Session.CurrentUser.EmployeeId;
+            if (!_employeeId.HasValue)
+            {
+                _employeeId = new EmployeeController().GetIdByEmail(Session.CurrentUser.Email);
+                if (_employeeId.HasValue)
+                    Session.CurrentUser.EmployeeId = _employeeId.Value;
+            }
             dtpFrom.MinDate = DateTime.Today;
             dtpTo.MinDate = DateTime.Today;
             dtpFrom.Value = DateTime.Today;
