@@ -22,14 +22,6 @@ namespace EmployeeManagementSystem.View
             dtpFrom.ValueChanged += UpdateRequestedDays;
             dtpTo.ValueChanged += UpdateRequestedDays;
 
-            if (!_employeeId.HasValue)
-            {
-                btnSubmit.Enabled = false;
-                MessageBox.Show(this, "Your account is not linked to an employee record.",
-                    "Leave", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
             try
             {
                 cboType.DisplayMember = "name";
@@ -41,6 +33,15 @@ namespace EmployeeManagementSystem.View
                 colRequestsFrom.DefaultCellStyle.Format = "d";
                 colRequestsTo.DefaultCellStyle.Format = "d";
                 colRequestsDays.DefaultCellStyle.Format = "0.##";
+
+                if (!_employeeId.HasValue)
+                {
+                    btnSubmit.Enabled = false;
+                    MessageBox.Show(this, "Your account is not linked to an employee record.",
+                        "Leave", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 RefreshData();
                 UpdateRequestedDays(this, EventArgs.Empty);
             }

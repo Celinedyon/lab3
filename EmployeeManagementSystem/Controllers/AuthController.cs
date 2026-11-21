@@ -21,8 +21,10 @@ namespace EmployeeManagementSystem.Controllers
                     link.Parameters.AddWithValue("@email", email.Trim());
                     link.ExecuteNonQuery();
                 }
-                string sql = "SELECT user_id, email, password_hash, role, is_active, employee_id " +
-                             "FROM users WHERE email = @email";
+                string sql = "SELECT u.user_id, u.email, u.password_hash, u.role, u.is_active, " +
+                             "COALESCE(u.employee_id, e.employee_id) AS employee_id " +
+                             "FROM users u LEFT JOIN employees e ON e.email = u.email " +
+                             "WHERE u.email = @email";
                 using (var cmd = new MySqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@email", email);
