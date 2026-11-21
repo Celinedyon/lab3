@@ -29,6 +29,7 @@ namespace EmployeeManagementSystem.View
                 cboDepartment.DisplayMember = "name";
                 cboDepartment.ValueMember = "name";
                 cboDepartment.DataSource = departments;
+                cboDepartment.SelectedIndexChanged += cboDepartment_SelectedIndexChanged;
                 RefreshEmployees();
             }
             catch (Exception ex)
@@ -41,6 +42,12 @@ namespace EmployeeManagementSystem.View
         private void btnSearch_Click(object sender, EventArgs e)
         {
             RefreshEmployees();
+        }
+
+        private void cboDepartment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cboDepartment.DataSource != null)
+                RefreshEmployees();
         }
 
         private void btnReset_Click(object sender, EventArgs e)
