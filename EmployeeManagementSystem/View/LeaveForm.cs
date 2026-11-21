@@ -47,7 +47,7 @@ namespace EmployeeManagementSystem.View
             }
             catch (Exception ex)
             {
-                btnSubmit.Enabled = false;
+                btnSubmit.Enabled = _employeeId.HasValue;
                 MessageBox.Show(this, "Unable to load leave information: " + ex.Message,
                     "Leave", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
