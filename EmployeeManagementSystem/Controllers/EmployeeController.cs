@@ -99,43 +99,62 @@ namespace EmployeeManagementSystem.Controllers
             }
         }
 
-        public string Create(Employee emp)
+        public string Create(Employee emp, string password)
         {
             if (string.IsNullOrWhiteSpace(emp.FirstName) || string.IsNullOrWhiteSpace(emp.LastName)
                 || string.IsNullOrWhiteSpace(emp.Email))
                 return "First name, last name and email are required.";
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
+                return "A login password of at least 8 characters is required.";
             try
             {
                 using (var conn = Database.GetConnection())
                 {
                     conn.Open();
-                    string code = GenerateEmployeeCode(conn);
-                    string sql = @"
-                        INSERT INTO employees (employee_code, first_name, last_name, email, phone, address,
-                                               date_of_birth, gender, hire_date, department_id, position_id,
-                                               status, emergency_name, emergency_phone)
-                        VALUES (@code, @first, @last, @email, @phone, @address,
-                                @dob, @gender, @hire, @dept, @pos, 'Active', @emgName, @emgPhone)";
-                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var transaction = conn.BeginTransaction())
                     {
-                        cmd.Parameters.AddWithValue("@code", code);
-                        cmd.Parameters.AddWithValue("@first", emp.FirstName);
-                        cmd.Parameters.AddWithValue("@last", emp.LastName);
-                        cmd.Parameters.AddWithValue("@email", emp.Email);
-                        cmd.Parameters.AddWithValue("@phone", (object)emp.Phone ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@address", (object)emp.Address ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@dob", (object)emp.DateOfBirth ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@gender", (object)emp.Gender ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@hire", emp.HireDate == default ? (object)DateTime.Today : emp.HireDate);
-                        cmd.Parameters.AddWithValue("@dept", (object)emp.DepartmentId ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@pos", (object)emp.PositionId ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@emgName", (object)emp.EmergencyName ?? DBNull.Value);
-                        cmd.Parameters.AddWithValue("@emgPhone", (object)emp.EmergencyPhone ?? DBNull.Value);
-                        cmd.ExecuteNonQuery();
-                        int employeeId = Convert.ToInt32(cmd.LastInsertedId);
-                        SaveSalary(conn, employeeId, emp.Salary, emp.Allowances, emp.Deductions);
+                        string code = GenerateEmployeeCode(conn, transaction);
+                        string sql = @"
+                            INSERT INTO employees (employee_code, first_name, last_name, email, phone, address,
+                                                   date_of_birth, gender, hire_date, department_id, position_id,
+                                                   status, emergency_name, emergency_phone)
+                            VALUES (@code, @first, @last, @email, @phone, @address,
+                                    @dob, @gender, @hire, @dept, @pos, 'Active', @emgName, @emgPhone)";
+                        int employeeId;
+                        using (var cmd = new MySqlCommand(sql, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@code", code);
+                            cmd.Parameters.AddWithValue("@first", emp.FirstName);
+                            cmd.Parameters.AddWithValue("@last", emp.LastName);
+                            cmd.Parameters.AddWithValue("@email", emp.Email);
+                            cmd.Parameters.AddWithValue("@phone", (object)emp.Phone ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@address", (object)emp.Address ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@dob", (object)emp.DateOfBirth ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@gender", (object)emp.Gender ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@hire", emp.HireDate == default ? (object)DateTime.Today : emp.HireDate);
+                            cmd.Parameters.AddWithValue("@dept", (object)emp.DepartmentId ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@pos", (object)emp.PositionId ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@emgName", (object)emp.EmergencyName ?? DBNull.Value);
+                            cmd.Parameters.AddWithValue("@emgPhone", (object)emp.EmergencyPhone ?? DBNull.Value);
+                            cmd.ExecuteNonQuery();
+                            employeeId = Convert.ToInt32(cmd.LastInsertedId);
+                        }
+
+                        SaveSalary(conn, transaction, employeeId, emp.Salary, emp.Allowances, emp.Deductions);
+                        InitializeLeaveBalances(conn, transaction, employeeId);
+
+                        using (var user = new MySqlCommand(@"
+                            INSERT INTO users (email, password_hash, role, is_active, employee_id)
+                            VALUES (@email, @hash, 'Employee', 1, @employeeId)", conn, transaction))
+                        {
+                            user.Parameters.AddWithValue("@email", emp.Email);
+                            user.Parameters.AddWithValue("@hash", BCrypt.Net.BCrypt.HashPassword(password));
+                            user.Parameters.AddWithValue("@employeeId", employeeId);
+                            user.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
                     }
-                    InitializeLeaveBalances(conn, code);
                 }
                 return null;
             }
@@ -240,30 +259,22 @@ namespace EmployeeManagementSystem.Controllers
                 adapter.Fill(table);
             return table;
         }
-        private string GenerateEmployeeCode(MySqlConnection conn)
+        private string GenerateEmployeeCode(MySqlConnection conn, MySqlTransaction transaction = null)
         {
-            using (var cmd = new MySqlCommand("SELECT IFNULL(MAX(CAST(SUBSTRING(employee_code, 4) AS UNSIGNED)), 0) FROM employees WHERE employee_code LIKE 'EMP%'", conn))
+            using (var cmd = new MySqlCommand("SELECT IFNULL(MAX(CAST(SUBSTRING(employee_code, 4) AS UNSIGNED)), 0) FROM employees WHERE employee_code LIKE 'EMP%'", conn, transaction))
             {
                 int next = Convert.ToInt32(cmd.ExecuteScalar()) + 1;
                 return $"EMP{next:D4}";
             }
         }
 
-        private void InitializeLeaveBalances(MySqlConnection conn, string employeeCode)
+        private void InitializeLeaveBalances(MySqlConnection conn, MySqlTransaction transaction, int employeeId)
         {
-            int employeeId = 0;
-            using (var cmd = new MySqlCommand("SELECT employee_id FROM employees WHERE employee_code = @code", conn))
-            {
-                cmd.Parameters.AddWithValue("@code", employeeCode);
-                var result = cmd.ExecuteScalar();
-                if (result != null) employeeId = Convert.ToInt32(result);
-            }
-            if (employeeId == 0) return;
             int year = DateTime.Now.Year;
             using (var cmd = new MySqlCommand(
                 @"INSERT INTO leave_balances (employee_id, leave_type_id, year, allocated_days, days_used)
                   SELECT @empId, leave_type_id, @year, days_allowed, 0 FROM leave_types WHERE is_active = 1
-                  ON DUPLICATE KEY UPDATE allocated_days = VALUES(allocated_days)", conn))
+                  ON DUPLICATE KEY UPDATE allocated_days = VALUES(allocated_days)", conn, transaction))
             {
                 cmd.Parameters.AddWithValue("@empId", employeeId);
                 cmd.Parameters.AddWithValue("@year", year);
@@ -273,11 +284,16 @@ namespace EmployeeManagementSystem.Controllers
 
         private void SaveSalary(MySqlConnection conn, int employeeId, decimal basicSalary, decimal allowances, decimal deductions)
         {
+            SaveSalary(conn, null, employeeId, basicSalary, allowances, deductions);
+        }
+
+        private void SaveSalary(MySqlConnection conn, MySqlTransaction transaction, int employeeId, decimal basicSalary, decimal allowances, decimal deductions)
+        {
             using (var cmd = new MySqlCommand(@"
                 INSERT INTO salaries (employee_id, basic_salary, allowances, deductions)
                 VALUES (@employeeId, @salary, @allowances, @deductions)
                 ON DUPLICATE KEY UPDATE basic_salary = VALUES(basic_salary),
-                    allowances = VALUES(allowances), deductions = VALUES(deductions)", conn))
+                    allowances = VALUES(allowances), deductions = VALUES(deductions)", conn, transaction))
             {
                 cmd.Parameters.AddWithValue("@employeeId", employeeId);
                 cmd.Parameters.AddWithValue("@salary", basicSalary);

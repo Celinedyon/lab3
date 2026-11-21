@@ -21,6 +21,11 @@ namespace EmployeeManagementSystem.View
             dtpBirth.ShowCheckBox = true;
             cboGender.Items.Insert(0, "Not specified");
             cboGender.SelectedIndex = 0;
+            if (_employeeId.HasValue)
+            {
+                lblPassword.Text = "Login Password (leave blank to keep)";
+                txtPassword.Enabled = false;
+            }
 
             try
             {
@@ -131,7 +136,9 @@ namespace EmployeeManagementSystem.View
                 Deductions = _employee == null ? 0 : _employee.Deductions
             };
 
-            string error = _employee == null ? _controller.Create(employee) : _controller.Update(employee);
+            string error = _employee == null
+                ? _controller.Create(employee, txtPassword.Text)
+                : _controller.Update(employee);
             if (error != null)
             {
                 MessageBox.Show(this, error, "Employee", MessageBoxButtons.OK, MessageBoxIcon.Warning);

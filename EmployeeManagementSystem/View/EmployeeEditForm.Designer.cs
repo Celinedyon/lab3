@@ -56,6 +56,8 @@
             this.dtpHireDate = new System.Windows.Forms.DateTimePicker();
             this.lblStatus = new System.Windows.Forms.Label();
             this.cboStatus = new System.Windows.Forms.ComboBox();
+            this.lblPassword = new System.Windows.Forms.Label();
+            this.txtPassword = new System.Windows.Forms.TextBox();
             this.grpEmergency = new System.Windows.Forms.GroupBox();
             this.lblEmgName = new System.Windows.Forms.Label();
             this.txtEmgName = new System.Windows.Forms.TextBox();
@@ -288,6 +290,8 @@
             this.grpJob.Controls.Add(this.dtpHireDate);
             this.grpJob.Controls.Add(this.lblStatus);
             this.grpJob.Controls.Add(this.cboStatus);
+            this.grpJob.Controls.Add(this.lblPassword);
+            this.grpJob.Controls.Add(this.txtPassword);
             this.grpJob.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.grpJob.ForeColor = System.Drawing.Color.FromArgb(26, 47, 77);
             this.grpJob.Location = new System.Drawing.Point(24, 326);
@@ -408,6 +412,27 @@
             this.cboStatus.Name = "cboStatus";
             this.cboStatus.Size = new System.Drawing.Size(206, 25);
             this.cboStatus.TabIndex = 9;
+            // 
+            // lblPassword
+            // 
+            this.lblPassword.AutoSize = true;
+            this.lblPassword.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPassword.ForeColor = System.Drawing.Color.FromArgb(51, 65, 85);
+            this.lblPassword.Location = new System.Drawing.Point(466, 82);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(101, 15);
+            this.lblPassword.TabIndex = 10;
+            this.lblPassword.Text = "Login Password *";
+            // 
+            // txtPassword
+            // 
+            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPassword.Location = new System.Drawing.Point(466, 100);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '*';
+            this.txtPassword.Size = new System.Drawing.Size(200, 25);
+            this.txtPassword.TabIndex = 11;
             // 
             // grpEmergency
             // 
@@ -572,6 +597,8 @@
         private System.Windows.Forms.DateTimePicker dtpHireDate;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.ComboBox cboStatus;
+        private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.GroupBox grpEmergency;
         private System.Windows.Forms.Label lblEmgName;
         private System.Windows.Forms.TextBox txtEmgName;
