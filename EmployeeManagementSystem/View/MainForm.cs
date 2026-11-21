@@ -67,7 +67,7 @@ namespace EmployeeManagementSystem.View
             switch (role)
             {
                 case "Administrator":
-                    return new[] { "Dashboard", "Users" };
+                    return new[] { "Dashboard", "Users", "Employees", "Departments", "Positions" };
                 case "HR Officer":
                     return new[] { "Dashboard", "Employees", "Departments", "Positions",
                                    "Leave Types", "Payroll", "Reports" };
