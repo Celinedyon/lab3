@@ -4,7 +4,21 @@ ALTER TABLE departments
 	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1;
 
 ALTER TABLE positions
-	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1;
+	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1,
+	ADD COLUMN IF NOT EXISTS department_id INT NULL;
+
+SET @position_department_fk_exists = (
+	SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+	WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'positions'
+		AND CONSTRAINT_NAME = 'fk_position_department'
+);
+SET @position_department_fk_sql = IF(@position_department_fk_exists = 0,
+	'ALTER TABLE positions ADD CONSTRAINT fk_position_department FOREIGN KEY (department_id) REFERENCES departments(department_id)',
+	'SELECT 1'
+);
+PREPARE position_department_fk_statement FROM @position_department_fk_sql;
+EXECUTE position_department_fk_statement;
+DEALLOCATE PREPARE position_department_fk_statement;
 
 ALTER TABLE leave_types
 	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1;

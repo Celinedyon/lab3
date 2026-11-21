@@ -30,18 +30,26 @@ namespace EmployeeManagementSystem.View
             try
             {
                 BindLookup(cboDepartment, _controller.GetDepartments(), "department_id", "name", "No department");
-                BindLookup(cboPosition, _controller.GetPositions(), "position_id", "title", "No position");
+                BindLookup(cboPosition, _controller.GetPositions(SelectedNullableId(cboDepartment)), "position_id", "title", "No position");
+                cboDepartment.SelectedValueChanged += cboDepartment_SelectedValueChanged;
                 if (_employeeId.HasValue)
                     LoadEmployee();
                 else
                     dtpHireDate.Value = DateTime.Today;
             }
+
             catch (Exception ex)
             {
                 btnSave.Enabled = false;
                 MessageBox.Show(this, "Unable to load employee details: " + ex.Message,
                     "Employee", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void cboDepartment_SelectedValueChanged(object sender, EventArgs e)
+        {
+            int? departmentId = SelectedNullableId(cboDepartment);
+            BindLookup(cboPosition, _controller.GetPositions(departmentId), "position_id", "title", "No position");
         }
 
         private static void BindLookup(ComboBox combo, DataTable data, string valueMember, string displayMember, string emptyLabel)

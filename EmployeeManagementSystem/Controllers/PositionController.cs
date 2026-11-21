@@ -12,7 +12,7 @@ namespace EmployeeManagementSystem.Controllers
         {
             var table = new DataTable();
             using (var conn = Database.GetConnection())
-            using (var cmd = new MySqlCommand("SELECT position_id AS ID, title AS Title, description, is_active FROM positions ORDER BY title", conn))
+                using (var cmd = new MySqlCommand("SELECT p.position_id AS ID, p.title AS Title, p.description, p.department_id, d.name AS Department, p.is_active FROM positions p LEFT JOIN departments d ON d.department_id = p.department_id ORDER BY p.title", conn))
             using (var adapter = new MySqlDataAdapter(cmd))
                 adapter.Fill(table);
             return table;
@@ -33,6 +33,8 @@ namespace EmployeeManagementSystem.Controllers
                         PositionId = r.GetInt32("position_id"),
                         Title = r.GetString("title"),
                         Description = r.IsDBNull(r.GetOrdinal("description")) ? null : r.GetString("description"),
+                        DepartmentId = r.IsDBNull(r.GetOrdinal("department_id")) ? (int?)null : r.GetInt32("department_id"),
+                        Department = r.IsDBNull(r.GetOrdinal("department")) ? null : r.GetString("department"),
                         IsActive = r.GetBoolean("is_active")
                     };
                 }
@@ -46,11 +48,12 @@ namespace EmployeeManagementSystem.Controllers
             {
                 using (var conn = Database.GetConnection())
                 using (var cmd = new MySqlCommand(
-                    "INSERT INTO positions (title, description, is_active) VALUES (@title, @desc, 1)", conn))
+                    "INSERT INTO positions (title, description, department_id, is_active) VALUES (@title, @desc, @department, 1)", conn))
                 {
                     conn.Open();
                     cmd.Parameters.AddWithValue("@title", pos.Title);
                     cmd.Parameters.AddWithValue("@desc", (object)pos.Description ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@department", (object)pos.DepartmentId ?? DBNull.Value);
                     cmd.ExecuteNonQuery();
                 }
                 return null;
@@ -66,12 +69,13 @@ namespace EmployeeManagementSystem.Controllers
             {
                 using (var conn = Database.GetConnection())
                 using (var cmd = new MySqlCommand(
-                    "UPDATE positions SET title = @title, description = @desc, is_active = @active WHERE position_id = @id", conn))
+                    "UPDATE positions SET title = @title, description = @desc, department_id = @department, is_active = @active WHERE position_id = @id", conn))
                 {
                     conn.Open();
                     cmd.Parameters.AddWithValue("@id", pos.PositionId);
                     cmd.Parameters.AddWithValue("@title", pos.Title);
                     cmd.Parameters.AddWithValue("@desc", (object)pos.Description ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@department", (object)pos.DepartmentId ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@active", pos.IsActive);
                     cmd.ExecuteNonQuery();
                 }

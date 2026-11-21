@@ -37,6 +37,8 @@
             this.lblCardTitle = new System.Windows.Forms.Label();
             this.lblTitle = new System.Windows.Forms.Label();
             this.txtTitle = new System.Windows.Forms.TextBox();
+            this.lblDepartment = new System.Windows.Forms.Label();
+            this.cboDepartment = new System.Windows.Forms.ComboBox();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnUpdate = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
@@ -103,13 +105,15 @@
             // 
             this.pnlDetails.BackColor = System.Drawing.Color.White;
             this.pnlDetails.Location = new System.Drawing.Point(656, 20);
-            this.pnlDetails.Size = new System.Drawing.Size(320, 186);
+            this.pnlDetails.Size = new System.Drawing.Size(320, 230);
             this.pnlDetails.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             this.pnlDetails.Name = "pnlDetails";
             this.pnlDetails.TabIndex = 2;
             this.pnlDetails.Controls.Add(this.lblCardTitle);
             this.pnlDetails.Controls.Add(this.lblTitle);
             this.pnlDetails.Controls.Add(this.txtTitle);
+            this.pnlDetails.Controls.Add(this.lblDepartment);
+            this.pnlDetails.Controls.Add(this.cboDepartment);
             this.pnlDetails.Controls.Add(this.btnAdd);
             this.pnlDetails.Controls.Add(this.btnUpdate);
             this.pnlDetails.Controls.Add(this.btnClear);
@@ -143,6 +147,26 @@
             this.txtTitle.Name = "txtTitle";
             this.txtTitle.TabIndex = 5;
             // 
+            // lblDepartment
+            // 
+            this.lblDepartment.AutoSize = true;
+            this.lblDepartment.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDepartment.ForeColor = System.Drawing.Color.FromArgb(30, 41, 59);
+            this.lblDepartment.Location = new System.Drawing.Point(20, 112);
+            this.lblDepartment.Name = "lblDepartment";
+            this.lblDepartment.TabIndex = 6;
+            this.lblDepartment.Text = "Department";
+            // 
+            // cboDepartment
+            // 
+            this.cboDepartment.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboDepartment.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cboDepartment.FormattingEnabled = true;
+            this.cboDepartment.Location = new System.Drawing.Point(20, 134);
+            this.cboDepartment.Name = "cboDepartment";
+            this.cboDepartment.Size = new System.Drawing.Size(280, 25);
+            this.cboDepartment.TabIndex = 7;
+            // 
             // btnAdd
             // 
             this.btnAdd.BackColor = System.Drawing.Color.FromArgb(31, 58, 95);
@@ -150,7 +174,7 @@
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(20, 126);
+            this.btnAdd.Location = new System.Drawing.Point(20, 178);
             this.btnAdd.Size = new System.Drawing.Size(88, 36);
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = false;
@@ -166,7 +190,7 @@
             this.btnUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUpdate.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnUpdate.ForeColor = System.Drawing.Color.FromArgb(31, 58, 95);
-            this.btnUpdate.Location = new System.Drawing.Point(116, 126);
+            this.btnUpdate.Location = new System.Drawing.Point(116, 178);
             this.btnUpdate.Size = new System.Drawing.Size(88, 36);
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = false;
@@ -182,7 +206,7 @@
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnClear.ForeColor = System.Drawing.Color.FromArgb(31, 58, 95);
-            this.btnClear.Location = new System.Drawing.Point(212, 126);
+            this.btnClear.Location = new System.Drawing.Point(212, 178);
             this.btnClear.Size = new System.Drawing.Size(88, 36);
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = false;
@@ -218,6 +242,8 @@
         private System.Windows.Forms.Label lblCardTitle;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.TextBox txtTitle;
+        private System.Windows.Forms.Label lblDepartment;
+        private System.Windows.Forms.ComboBox cboDepartment;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.Button btnClear;

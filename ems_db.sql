@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS departments (
 CREATE TABLE IF NOT EXISTS positions (
 	position_id INT AUTO_INCREMENT PRIMARY KEY,
 	title VARCHAR(100) NOT NULL UNIQUE,
-	is_active TINYINT(1) NOT NULL DEFAULT 1
+	department_id INT NULL,
+	is_active TINYINT(1) NOT NULL DEFAULT 1,
+	FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
 
 CREATE TABLE IF NOT EXISTS employees (

@@ -15,11 +15,11 @@ namespace EmployeeManagementSystem.Controllers
             {
                 conn.Open();
                 string sql = @"
-                    SELECT e.employee_id, e.employee_code, e.first_name, e.last_name, e.email,
-                           e.phone, e.address, e.date_of_birth, e.gender, e.hire_date,
+                        SELECT e.employee_id, e.employee_code AS EmployeeCode, e.first_name, e.last_name, e.email,
+                               e.phone, e.address, e.date_of_birth, e.gender, e.hire_date AS HireDate,
                            CONCAT(e.first_name, ' ', e.last_name) AS FullName,
-                           e.department_id, d.name AS department,
-                           e.position_id, p.title AS position,
+                               e.department_id, d.name AS Department,
+                               e.position_id, p.title AS Position,
                            NULL AS manager_id, NULL AS mgr_first, NULL AS mgr_last,
                            e.status, e.emergency_name, e.emergency_phone,
                            COALESCE(s.basic_salary, 0) AS salary,
@@ -240,13 +240,16 @@ namespace EmployeeManagementSystem.Controllers
             return table;
         }
 
-        public DataTable GetPositions()
+        public DataTable GetPositions(int? departmentId = null)
         {
             var table = new DataTable();
             using (var conn = Database.GetConnection())
-            using (var cmd = new MySqlCommand("SELECT position_id, title FROM positions WHERE is_active = 1 ORDER BY title", conn))
-            using (var adapter = new MySqlDataAdapter(cmd))
-                adapter.Fill(table);
+            using (var cmd = new MySqlCommand("SELECT position_id, title FROM positions WHERE is_active = 1 AND (@departmentId IS NULL OR department_id = @departmentId) ORDER BY title", conn))
+            {
+                cmd.Parameters.AddWithValue("@departmentId", (object)departmentId ?? DBNull.Value);
+                using (var adapter = new MySqlDataAdapter(cmd))
+                    adapter.Fill(table);
+            }
             return table;
         }
 
