@@ -8,16 +8,36 @@ CREATE TABLE IF NOT EXISTS departments (
 	is_active TINYINT(1) NOT NULL DEFAULT 1
 );
 
+ALTER TABLE departments
+	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1;
+
+INSERT IGNORE INTO departments (name, is_active) VALUES
+	('HR', 1), ('Finance', 1), ('IT', 1), ('Operations', 1);
+
 CREATE TABLE IF NOT EXISTS positions (
 	position_id INT AUTO_INCREMENT PRIMARY KEY,
 	title VARCHAR(100) NOT NULL UNIQUE,
 	department_id INT NULL,
 	is_active TINYINT(1) NOT NULL DEFAULT 1,
-	FOREIGN KEY (department_id) REFERENCES departments(department_id)
+	CONSTRAINT fk_position_department FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
 
-INSERT IGNORE INTO departments (name, is_active) VALUES
-	('HR', 1), ('Finance', 1), ('IT', 1), ('Operations', 1);
+ALTER TABLE positions
+	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1,
+	ADD COLUMN IF NOT EXISTS department_id INT NULL;
+
+SET @position_department_fk_exists = (
+	SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+	WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'positions'
+		AND CONSTRAINT_NAME = 'fk_position_department'
+);
+SET @position_department_fk_sql = IF(@position_department_fk_exists = 0,
+	'ALTER TABLE positions ADD CONSTRAINT fk_position_department FOREIGN KEY (department_id) REFERENCES departments(department_id)',
+	'SELECT 1'
+);
+PREPARE position_department_fk_statement FROM @position_department_fk_sql;
+EXECUTE position_department_fk_statement;
+DEALLOCATE PREPARE position_department_fk_statement;
 
 CREATE TABLE IF NOT EXISTS employees (
 	employee_id INT AUTO_INCREMENT PRIMARY KEY,
