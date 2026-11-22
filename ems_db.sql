@@ -17,6 +17,7 @@ INSERT IGNORE INTO departments (name, is_active) VALUES
 CREATE TABLE IF NOT EXISTS positions (
 	position_id INT AUTO_INCREMENT PRIMARY KEY,
 	title VARCHAR(100) NOT NULL UNIQUE,
+	description VARCHAR(255) NULL,
 	department_id INT NULL,
 	is_active TINYINT(1) NOT NULL DEFAULT 1,
 	CONSTRAINT fk_position_department FOREIGN KEY (department_id) REFERENCES departments(department_id)
@@ -24,7 +25,8 @@ CREATE TABLE IF NOT EXISTS positions (
 
 ALTER TABLE positions
 	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1,
-	ADD COLUMN IF NOT EXISTS department_id INT NULL;
+	ADD COLUMN IF NOT EXISTS department_id INT NULL,
+	ADD COLUMN IF NOT EXISTS description VARCHAR(255) NULL;
 
 SET @position_department_fk_exists = (
 	SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
