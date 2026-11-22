@@ -1,10 +1,10 @@
 USE ems_db;
 
-INSERT IGNORE INTO departments (name, is_active) VALUES
-	('HR', 1), ('Finance', 1), ('IT', 1), ('Operations', 1);
-
 ALTER TABLE departments
 	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1;
+
+INSERT IGNORE INTO departments (name, is_active) VALUES
+	('HR', 1), ('Finance', 1), ('IT', 1), ('Operations', 1);
 
 ALTER TABLE positions
 	ADD COLUMN IF NOT EXISTS is_active TINYINT(1) NOT NULL DEFAULT 1,
