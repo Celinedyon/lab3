@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS positions (
 	FOREIGN KEY (department_id) REFERENCES departments(department_id)
 );
 
+INSERT IGNORE INTO departments (name, is_active) VALUES
+	('HR', 1), ('Finance', 1), ('IT', 1), ('Operations', 1);
+
 CREATE TABLE IF NOT EXISTS employees (
 	employee_id INT AUTO_INCREMENT PRIMARY KEY,
 	employee_code VARCHAR(30) NOT NULL UNIQUE,

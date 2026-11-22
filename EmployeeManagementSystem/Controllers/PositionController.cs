@@ -44,6 +44,7 @@ namespace EmployeeManagementSystem.Controllers
         public string Create(Position pos)
         {
             if (string.IsNullOrWhiteSpace(pos.Title)) return "Position title is required.";
+            if (!pos.DepartmentId.HasValue) return "Select a department for this position.";
             try
             {
                 using (var conn = Database.GetConnection())
@@ -65,6 +66,7 @@ namespace EmployeeManagementSystem.Controllers
         {
             if (pos.PositionId <= 0) return "Invalid position.";
             if (string.IsNullOrWhiteSpace(pos.Title)) return "Position title is required.";
+            if (!pos.DepartmentId.HasValue) return "Select a department for this position.";
             try
             {
                 using (var conn = Database.GetConnection())
